@@ -44,8 +44,6 @@ public class MainActivity extends TopBarActivity {
         buttConnectMenu = topBar.findViewById(R.id.butt_connect_menu);
         connecting = findViewById(R.id.connecting);
 
-        //changeButtonClickableBackgroundColor();
-
         buttConnectLiquidGalaxy = findViewById(R.id.butt_connect_liquid_galaxy);
         URI = findViewById(R.id.uri);
         username = findViewById(R.id.username);
@@ -244,14 +242,4 @@ public class MainActivity extends TopBarActivity {
     private boolean isValidHostNPort(String hostPort) {
         return HOST_PORT.matcher(hostPort).matches();
     }
-
-    /**
-     * Change the background color and the option clickable to false of the button_connect
-     */
-    /*
-    private void changeButtonClickableBackgroundColor() {
-        changeButtonClickableBackgroundColor(getApplicationContext(), buttConnectMenu);
-    }
-    */
-
 }

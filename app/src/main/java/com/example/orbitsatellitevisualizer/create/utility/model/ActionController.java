@@ -61,77 +61,6 @@ public class ActionController {
      */
     private ActionController() {}
 
-    /**
-     * Move the screen to the poi
-     *
-     * @param poi      The POI that is going to move
-     * @param listener The listener of lgcommand
-     */
-    public void moveToPOI(POI poi, LGCommand.Listener listener) {
-        cleanFileKMLs(0);
-        sendPoiToLG(poi, listener);
-    }
-
-    /**
-     * Create the lGCommand to send to the liquid galaxy
-     *
-     * @param listener The LGCommand listener
-     */
-    private void sendPoiToLG(POI poi, LGCommand.Listener listener) {
-        LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildCommandPOITest(poi), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-            if (listener != null) {
-                listener.onResponse(result);
-            }
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-    }
-
-
-    /**
-     * First Clean the KML and then do the orbit
-     *
-     * @param poi      POI
-     * @param listener Listener
-     */
-    public synchronized void cleanOrbit(POI poi, LGCommand.Listener listener) {
-        cleanFileKMLs(0);
-        orbit(poi, listener);
-    }
-
-    /**
-     * Do the orbit
-     *
-     * @param poi      POI
-     * @param listener Listener
-     */
-    public void orbit(POI poi, LGCommand.Listener listener) {
-        LGCommand lgCommandOrbit = new LGCommand(ActionBuildCommandUtility.buildCommandOrbit(poi), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-            if (listener != null) {
-                listener.onResponse(result);
-            }
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommandOrbit);
-
-        LGCommand lgCommandWriteOrbit = new LGCommand(ActionBuildCommandUtility.buildCommandWriteOrbit(), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-            if (listener != null) {
-                listener.onResponse(result);
-            }
-        });
-        lgConnectionManager.addCommandToLG(lgCommandWriteOrbit);
-
-        LGCommand lgCommandStartOrbit = new LGCommand(ActionBuildCommandUtility.buildCommandStartOrbit(), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-            if (listener != null) {
-                listener.onResponse(result);
-            }
-        });
-        handler.postDelayed(() -> lgConnectionManager.addCommandToLG(lgCommandStartOrbit), 500);
-        cleanFileKMLs(46000);
-    }
-
     public void startOrbit(LGCommand.Listener listener) {
 
         LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
@@ -146,70 +75,6 @@ public class ActionController {
         //cleanFileKMLs(46000);
     }
 
-    /**
-     * @param balloon  Balloon with the information to build command
-     * @param listener listener
-     */
-    public void sendBalloon(Balloon balloon, LGCommand.Listener listener) {
-        cleanFileKMLs(0);
-
-        Uri imageUri = balloon.getImageUri();
-        if (imageUri != null) {
-            createResourcesFolder();
-            String imagePath = balloon.getImagePath();
-            LGConnectionSendFile lgConnectionSendFile = LGConnectionSendFile.getInstance();
-            lgConnectionSendFile.addPath(imagePath);
-            lgConnectionSendFile.startConnection();
-        }
-
-        handler.postDelayed(() -> {
-            LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildCommandBalloonTest(balloon), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-                if (listener != null) {
-                    listener.onResponse(result);
-                }
-            });
-            LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-            lgConnectionManager.startConnection();
-            lgConnectionManager.addCommandToLG(lgCommand);
-
-            handler.postDelayed(this::writeFileBalloonFile, 500);
-        }, 500);
-    }
-
-    /**
-     * @param balloon  Balloon with the information to build command
-     * @param listener listener
-     */
-    public void sendBalloonTestStoryBoard(Balloon balloon, LGCommand.Listener listener) {
-        cleanFileKMLs(0);
-
-        LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildCommandBalloonTest(balloon), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-            if (listener != null) {
-                listener.onResponse(result);
-            }
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-
-        handler.postDelayed(this::writeFileBalloonFile, 500);
-    }
-
-    /**
-     * Send the image of the balloon
-     *
-     * @param balloon Balloon
-     */
-    public void sendImageTestStoryboard(Balloon balloon) {
-        Uri imageUri = balloon.getImageUri();
-        if (imageUri != null) {
-            String imagePath = balloon.getImagePath();
-            Log.w(TAG_DEBUG, "Image Path: " + imagePath);
-            LGConnectionSendFile lgConnectionSendFile = LGConnectionSendFile.getInstance();
-            lgConnectionSendFile.addPath(imagePath);
-            lgConnectionSendFile.startConnection();
-        }
-    }
 
     /**
      * Paint a balloon with the logos
@@ -395,28 +260,7 @@ public class ActionController {
         }
         return file.getPath();
     }
-    private String getKMLFile(AppCompatActivity activity) {
-        File file = new File(activity.getFilesDir() + "/ISS.kml");
-        if (!file.exists()) {
-            try {
-                InputStream is = activity.getAssets().open("ISS.kml");
-                int size = is.available();
-                Log.w(TAG_DEBUG, "GET ISS KML SIZE: " + size);
-                byte[] buffer = new byte[size];
-                is.read(buffer);
-                is.close();
 
-                FileOutputStream fos = new FileOutputStream(file);
-                fos.write(buffer);
-                fos.close();
-
-                return file.getPath();
-            } catch (Exception e) {
-                Log.w(TAG_DEBUG, "ERROR: " + e.getMessage());
-            }
-        }
-        return file.getPath();
-    }
 
     private String getStarlinkFile(AppCompatActivity activity) {
         File file = new File(activity.getFilesDir() + "/Starlink.kml");
@@ -552,60 +396,11 @@ public class ActionController {
         return file.getPath();
     }
 
-    private String readDemoFile(AppCompatActivity activity) {
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(
-                    new InputStreamReader(activity.getAssets().open("demo.txt"), StandardCharsets.UTF_8));
-
-            StringBuilder string = new StringBuilder();
-            String mLine;
-            while ((mLine = reader.readLine()) != null) {
-                string.append(mLine);
-            }
-            return string.toString();
-        } catch (IOException e) {
-            Log.w(TAG_DEBUG, "ERROR READING FILE: " + e.getMessage());
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    Log.w(TAG_DEBUG, "ERROR CLOSING: " + e.getMessage());
-                }
-            }
-        }
-        return "";
-    }
-
-
     /**
      * Create the Resource folder
      */
     public void createResourcesFolder() {
         LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildCommandCreateResourcesFolder(), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-    }
-
-
-    /**
-     * Write the shape.kml in the Liquid Galaxy
-     */
-    private void writeFileShapeFile() {
-        LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildWriteShapeFile(),
-                LGCommand.CRITICAL_MESSAGE, (String result) -> {
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-    }
-
-    private void writeFileISSFile() {
-        LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildWriteISSFile(),
-                LGCommand.CRITICAL_MESSAGE, (String result) -> {
         });
         LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
         lgConnectionManager.startConnection();
@@ -671,14 +466,11 @@ public class ActionController {
                 System.out.println("ERROR" + e.toString());
             }
         };
-        //System.out.println("Submitting the tasks for execution...");
         executorService.submit(task1);
         executorService.shutdown();
     }
 
     public void sendLiveGroup(AppCompatActivity activity, String group_name) {
-        //System.out.println("Inside : " + Thread.currentThread().getName());
-        //System.out.println("Creating Executor Service with a thread pool of Size 1");
         ExecutorService executorService = Executors.newFixedThreadPool(1);
         Runnable task1 = () -> {
             try {
@@ -769,313 +561,9 @@ public class ActionController {
                 System.out.println("ERROR" + e.toString());
             }
         };
-        //System.out.println("Submitting the tasks for execution...");
         executorService.submit(task1);
         executorService.shutdown();
     }
-
-
-    public void sendLiveSCNtest(AppCompatActivity activity, String scn) {
-        System.out.println("Inside : " + Thread.currentThread().getName());
-        System.out.println("Creating Executor Service with a thread pool of Size 1");
-        ExecutorService executorService = Executors.newFixedThreadPool(1);
-        Runnable task1 = () -> {
-            try {
-                String url = "https://celestrak.com/NORAD/elements/gp.php?CATNR=" + scn + "&FORMAT=TLE";
-                System.out.println(url);
-                String completeTLE[] = Jsoup.connect(url).ignoreContentType(true).execute().body().split("\\n");
-                Date date = new Date();
-
-                int points = 0;
-                int max_points = 60;
-
-                StringBuilder orbit_points = new StringBuilder();
-                StringBuilder groundpath_points = new StringBuilder();
-                //StringBuilder satellite_poi = new StringBuilder();
-                double[] satellite_poi = {0,0,0};
-                Date calculedDate;
-                while (points <= max_points) {
-                    calculedDate = addHoursToJavaUtilDate(date, 2*points);
-                    double[] lla_coords_loop = TlePredictionEngine.getSatellitePosition(completeTLE[1], completeTLE[2], true, calculedDate);
-                    System.out.println(calculedDate);
-
-                    if (points == 0) {
-                        satellite_poi = lla_coords_loop;
-                    }
-
-                    orbit_points.append(" " + lla_coords_loop[0] + "," + lla_coords_loop[1] + "," + lla_coords_loop[2]*1000);
-                    groundpath_points.append(" " + lla_coords_loop[0] + "," + lla_coords_loop[1] + "," + "0");
-                    points++;
-                }
-                System.out.println("\n\n\n" + orbit_points);
-                System.out.println("\n\n\n" + groundpath_points);
-
-                /*
-                String kml = "echo '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                        "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\">\n" +
-                        "    <Document id=\"1\">\n" +
-                        "        <Style id=\"6\">\n" +
-                        "            <LineStyle id=\"7\">\n" +
-                        "                <color>ff0000ff</color>\n" +
-                        "                <colorMode>normal</colorMode>\n" +
-                        "            </LineStyle>\n" +
-                        "        </Style>\n" +
-                        "        <Placemark id=\"3\">\n" +
-                        "            <name>25544</name>\n" +
-                        "            <LineString id=\"2\">\n" +
-                        "                <coordinates>" + orbit_points +"</coordinates>\n" +
-                        "                <extrude>0</extrude>\n" +
-                        "                <altitudeMode>relativeToGround</altitudeMode>\n" +
-                        "            </LineString>\n" +
-                        "        </Placemark>\n" +
-                        "        <Placemark id=\"5\">\n" +
-                        "            <name>25544</name>\n" +
-                        "            <styleUrl>#6</styleUrl>\n" +
-                        "            <LineString id=\"4\">\n" +
-                        "                <coordinates>" + groundpath_points +"</coordinates>\n" +
-                        "                <extrude>0</extrude>\n" +
-                        "                <altitudeMode>relativeToGround</altitudeMode>\n" +
-                        "            </LineString>\n" +
-                        "        </Placemark>\n" +
-                        "    </Document>\n" +
-                        "</kml>" +
-                        "' > /var/www/html/liveSCN" + scn + ".kml";
-
-
-                String kml = "echo '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                        "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\">\n" +
-                        "    <Document id=\"1\">\n" +
-                        "        <Style id=\"6\">\n" +
-                        "            <LineStyle id=\"7\">\n" +
-                        "                <color>ff0000ff</color>\n" +
-                        "                <colorMode>normal</colorMode>\n" +
-                        "            </LineStyle>\n" +
-                        "        </Style>\n" +
-                        "        <Placemark id=\"3\">\n" +
-                        "            <name>ISS</name>\n" +
-                        "            <description>ISS</description>\n" +
-                        "            <styleUrl>#4</styleUrl>\n" +
-                        "            <gx:balloonVisibility>0</gx:balloonVisibility>\n" +
-                        "            <Point id=\"2\">\n" +
-                        "                <coordinates>" + satellite_poi[1] + "," + satellite_poi[0] + "," + satellite_poi[2] + "</coordinates>\n" +
-                        "                <extrude>0</extrude>\n" +
-                        "                <altitudeMode>relativeToGround</altitudeMode>\n" +
-                        "            </Point>\n" +
-                        "        </Placemark>\n" +
-                        "        <Placemark id=\"3\">\n" +
-                        "            <name>25544</name>\n" +
-                        "            <LineString id=\"2\">\n" +
-                        "                <coordinates>" + orbit_points +"</coordinates>\n" +
-                        "                <extrude>0</extrude>\n" +
-                        "                <altitudeMode>relativeToGround</altitudeMode>\n" +
-                        "            </LineString>\n" +
-                        "        </Placemark>\n" +
-                        "        <Placemark id=\"5\">\n" +
-                        "            <name>25544</name>\n" +
-                        "            <styleUrl>#6</styleUrl>\n" +
-                        "            <LineString id=\"4\">\n" +
-                        "                <coordinates>" + groundpath_points +"</coordinates>\n" +
-                        "                <extrude>0</extrude>\n" +
-                        "                <altitudeMode>relativeToGround</altitudeMode>\n" +
-                        "            </LineString>\n" +
-                        "        </Placemark>\n" +
-                        "    </Document>\n" +
-                        "</kml>\n" +
-                        "' > /var/www/html/liveSCN" + scn + ".kml";
-                */
-
-                String kml = "echo '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                        "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\">\n" +
-                        "    <Document id=\"1\">\n" +
-                        "        <Style id=\"4\">\n" +
-                        "            <LineStyle id=\"5\">\n" +
-                        "                <color>ff0000ff</color>\n" +
-                        "                <colorMode>normal</colorMode>\n" +
-                        "            </LineStyle>\n" +
-                        "            <BalloonStyle>\n" +
-                        "                <bgColor>ffffffff</bgColor>\n" +
-                        "                <textColor>ffff0000</textColor>\n" +
-                        "                <displayMode>default</displayMode>\n" +
-                        "            </BalloonStyle>\n" +
-                        "        </Style>\n" +
-                        "        <Style id=\"9\">\n" +
-                        "            <LineStyle id=\"10\">\n" +
-                        "                <color>ffffffff</color>\n" +
-                        "                <colorMode>normal</colorMode>\n" +
-                        "                <width>2</width>\n" +
-                        "            </LineStyle>\n" +
-                        "        </Style>\n" +
-                        "        <Style id=\"13\">\n" +
-                        "            <LineStyle id=\"14\">\n" +
-                        "                <color>c80000ff</color>\n" +
-                        "                <colorMode>normal</colorMode>\n" +
-                        "            </LineStyle>\n" +
-                        "        </Style>\n" +
-                        "        <Placemark id=\"3\">\n" +
-                        "            <name>ISS</name>\n" +
-                        "            <description>ISS</description>\n" +
-                        "            <styleUrl>#4</styleUrl>\n" +
-                        "            <gx:balloonVisibility>0</gx:balloonVisibility>\n" +
-                        "            <Point id=\"2\">\n" +
-                        "                <coordinates>" + satellite_poi[0] + "," + satellite_poi[1] + "," + satellite_poi[2] + "</coordinates>\n" +
-                        "                <extrude>1</extrude>\n" +
-                        "                <altitudeMode>relativeToGround</altitudeMode>\n" +
-                        "            </Point>\n" +
-                        "        </Placemark>\n" +
-                        "        <Placemark id=\"3\">\n" +
-                        "            <name>ISS</name>\n" +
-                        "            <description>ISS</description>\n" +
-                        "            <styleUrl>#4</styleUrl>\n" +
-                        "            <gx:balloonVisibility>0</gx:balloonVisibility>\n" +
-                        "            <Point id=\"2\">\n" +
-                        "                <coordinates>" + satellite_poi[0] + "," + satellite_poi[1] + "," + "0" + "</coordinates>\n" +
-                        "                <extrude>0</extrude>\n" +
-                        "                <altitudeMode>relativeToGround</altitudeMode>\n" +
-                        "            </Point>\n" +
-                        "        </Placemark>\n" +
-                        "    </Document>\n" +
-                        "</kml>\n" +
-                        "' > /var/www/html/liveSCN" + scn + ".kml";
-
-
-                Log.w(TAG_DEBUG, "DEF COMMAND: " + kml.toString());
-                System.out.println("<coordinates>" + orbit_points +"</coordinates>\n");
-                LGCommand lgCommand = new LGCommand(kml, LGCommand.CRITICAL_MESSAGE,(String result) -> {
-                });
-                LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-                lgConnectionManager.startConnection();
-                lgConnectionManager.addCommandToLG(lgCommand);
-
-                // orbitLLA(lla_coords, null);
-
-                writeLiveSCN(scn);
-
-            } catch (Exception e) {
-                System.out.println("ERROR" + e.toString());
-            }
-        };
-        System.out.println("Submitting the tasks for execution...");
-        executorService.submit(task1);
-        executorService.shutdown();
-    }
-
-
-
-
-    /**
-     * Send the command to liquid galaxy
-     *
-     * @param listener listener
-
-    public void sendShape(Shape shape, LGCommand.Listener listener) {
-        cleanFileKMLs(0);
-
-        LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildCommandSendShape(), LGCommand.CRITICAL_MESSAGE, (String result) -> { //Should be buildCommandSendShape(shape)
-            if (listener != null) {
-                listener.onResponse(result);
-            }
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-
-        handler.postDelayed(this::writeFileShapeFile, 500);
-    }
-    */
-    /*
-    public void sendPOI(LGCommand.Listener listener, POI poi) {
-        cleanFileKMLs(0);
-
-        LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildCommandSendShape(POI poi), LGCommand.CRITICAL_MESSAGE, (String result)) -> {
-            if (listener != null) {
-                listener.onResponse(result);
-            }
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-
-        handler.postDelayed(this::writeFileShapeFile, 500);
-    }
-    */
-
-
-
-
-    public void sendStarlink(LGCommand.Listener listener) {
-        cleanFileKMLs(0);
-
-        LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildCommandSendStarlink(), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-            if (listener != null) {
-                listener.onResponse(result);
-            }
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-
-        handler.postDelayed(this::writeFileShapeFile, 500);
-    }
-
-    public void sendISS(LGCommand.Listener listener) {
-        cleanFileKMLs(0);
-        /*
-        LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildCommandSendISS(), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-            if (listener != null) {
-                listener.onResponse(result);
-            }
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-        */
-        handler.postDelayed(this::writeFileShapeFile, 500);
-    }
-    /*
-    public void sendEnxaneta(LGCommand.Listener listener) {
-        cleanFileKMLs(0);
-
-        LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildCommandSendEnxaneta(), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-            if (listener != null) {
-                listener.onResponse(result);
-            }
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-
-        handler.postDelayed(this::writeFileShapeFile, 500);
-    }
-
-    public void sendStarlinkConst(LGCommand.Listener listener) {
-        cleanFileKMLs(0);
-
-        LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildCommandSendStarlinkConst(), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-            if (listener != null) {
-                listener.onResponse(result);
-            }
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-
-        handler.postDelayed(this::writeFileShapeFile, 500);
-    }
-
-    public void sendIridiumConst(LGCommand.Listener listener) {
-        cleanFileKMLs(0);
-
-        LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildCommandSendIridiumConst(), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-            if (listener != null) {
-                listener.onResponse(result);
-            }
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-
-        handler.postDelayed(this::writeFileShapeFile, 500);
-    }*/
 
     /**
      * It cleans the kmls.txt file
@@ -1108,89 +596,6 @@ public class ActionController {
         }, duration);
     }
 
-
-    /**
-     * Send both command to the Liquid Galaxy
-     *
-     * @param poi     Poi with the location information
-     * @param balloon Balloon with the information to paint the balloon
-     */
-    public void TourGDG(POI poi, Balloon balloon) {
-        cleanFileKMLs(0);
-        sendBalloonTourGDG(balloon, null);
-        sendPoiToLG(poi, null);
-    }
-
-    /**
-     * Send a balloon in the case of the tour
-     *
-     * @param balloon  Balloon with the information to build command
-     * @param listener listener
-     */
-    private void sendBalloonTourGDG(Balloon balloon, LGCommand.Listener listener) {
-        LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildCommandBalloonTest(balloon), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-            if (listener != null) {
-                listener.onResponse(result);
-            }
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-
-        handler.postDelayed(this::writeFileBalloonFile, 1000);
-    }
-
-    /**
-     * Write the file of the balloon
-     */
-    private void writeFileBalloonFile() {
-        LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildWriteBalloonFile(),
-                LGCommand.CRITICAL_MESSAGE, (String result) -> {
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-    }
-
-    private void writeLiveEnxaneta() {
-        String command = "echo 'http://lg1:81/liveEnxaneta.kml' > " +
-                "/var/www/html/" +
-                "kmls.txt";
-        Log.w(TAG_DEBUG, "command: " + command);
-        LGCommand lgCommand = new LGCommand(command,
-                LGCommand.CRITICAL_MESSAGE, (String result) -> {
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-    }
-
-    private void writeLiveISS() {
-        String command = "echo 'http://lg1:81/liveISS.kml' > " +
-                "/var/www/html/" +
-                "kmls.txt";
-        Log.w(TAG_DEBUG, "command: " + command);
-        LGCommand lgCommand = new LGCommand(command,
-                LGCommand.CRITICAL_MESSAGE, (String result) -> {
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-    }
-
-    private void writeLiveStarlink() {
-        String command = "echo 'http://lg1:81/liveStarlink.kml' > " +
-                "/var/www/html/" +
-                "kmls.txt";
-        Log.w(TAG_DEBUG, "command: " + command);
-        LGCommand lgCommand = new LGCommand(command,
-                LGCommand.CRITICAL_MESSAGE, (String result) -> {
-        });
-        LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-        lgConnectionManager.startConnection();
-        lgConnectionManager.addCommandToLG(lgCommand);
-    }
-
     public void writeLiveSCN(String scn) {
         String command = "echo 'http://localhost:81/liveSCN" + scn + ".kml' > " +
                 "/var/www/html/" +
@@ -1207,8 +612,6 @@ public class ActionController {
     public void sendSpaceportFile(AppCompatActivity activity, String description, String name, double[] lla_coords, String imagePath) {
 
         createResourcesFolder();
-        //String imageName = getSpaceportFile(activity, imagePath);
-        //Log.w(TAG_DEBUG, "Spaceport image file: " + imageName);
         cleanFileKMLs(0);
         /* Inserts the orbit part as a tour */
         String orbit = ActionBuildCommandUtility.buildCommandInsertOrbit(lla_coords, 1000);
@@ -1300,74 +703,6 @@ public class ActionController {
         lgConnectionManager.addCommandToLG(lgCommand);
     }
 
-    private String getSpaceportFile(AppCompatActivity activity, String imageName) {
-        System.out.println("ImageName: " + imageName);
-        File file = new File(activity.getFilesDir() + imageName);
-        System.out.println("File exist? : " + file.exists());
-        if (!file.exists()) {
-            try {
-                InputStream is = activity.getAssets().open(imageName);
-                //InputStream is = bitmapToInputStream(drawableToBitmap(activity.getDrawable(R.drawable.china_sp)));
-                int size = is.available();
-                Log.w(TAG_DEBUG, "GET SPACEPORT IMAGE SIZE: " + size);
-                byte[] buffer = new byte[size];
-                is.read(buffer);
-                is.close();
-
-                FileOutputStream fos = new FileOutputStream(file);
-                fos.write(buffer);
-                fos.close();
-
-                return file.getPath();
-            } catch (Exception e) {
-                Log.w(TAG_DEBUG, "ERROR GET SPACEPORT FILE: " + e.getMessage());
-            }
-        }
-        String imagePath = file.getPath();
-        System.out.println("FINAL IMAGE PATH: " + imagePath);
-        LGConnectionSendFile lgConnectionSendFile = LGConnectionSendFile.getInstance();
-        lgConnectionSendFile.addPath(imagePath);
-        lgConnectionSendFile.startConnection();
-
-        return imageName;
-    }
-
-
-
-
-
-    /**
-     * Send the tour kml
-     * @param actions Storyboard's actions
-     * @param listener Listener
-     */
-    public void sendTour(List<Action> actions, LGCommand.Listener listener){
-        cleanFileKMLs(0);
-        handler.postDelayed(() -> {
-            LGCommand lgCommand = new LGCommand(ActionBuildCommandUtility.buildCommandTour(actions), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-                if (listener != null) {
-                    listener.onResponse(result);
-                }
-            });
-            LGConnectionManager lgConnectionManager = LGConnectionManager.getInstance();
-            lgConnectionManager.startConnection();
-            lgConnectionManager.addCommandToLG(lgCommand);
-
-            LGCommand lgCommandWriteTour = new LGCommand(ActionBuildCommandUtility.buildCommandwriteStartTourFile(), LGCommand.CRITICAL_MESSAGE, (String result) -> {
-                if (listener != null) {
-                    listener.onResponse(result);
-                }
-            });
-            lgConnectionManager.addCommandToLG(lgCommandWriteTour);
-
-            LGCommand lgCommandStartTour = new LGCommand(ActionBuildCommandUtility.buildCommandStartTour(),
-                    LGCommand.CRITICAL_MESSAGE, (String result) -> {
-            });
-            handler2.postDelayed(() -> lgConnectionManager.addCommandToLG(lgCommandStartTour), 1500);
-        }, 1000);
-    }
-
-
     /**
      * Exit Tour
      */
@@ -1385,33 +720,4 @@ public class ActionController {
         });
         lgConnectionManager.addCommandToLG(lgCommandCleanSlaves);
     };
-
-    public Date addHoursToJavaUtilDate(Date date, int hours) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        //calendar.add(Calendar.HOUR_OF_DAY, hours);
-        calendar.add(Calendar.MINUTE, hours);
-        return calendar.getTime();
-    }
-
-    public static Bitmap drawableToBitmap (Drawable drawable) {
-        if (drawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable)drawable).getBitmap();
-        }
-
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-
-        return bitmap;
-    }
-
-    public static InputStream bitmapToInputStream(Bitmap bitmap) {
-        int size = bitmap.getHeight() * bitmap.getRowBytes();
-        ByteBuffer buffer = ByteBuffer.allocate(size);
-        bitmap.copyPixelsToBuffer(buffer);
-        return new ByteArrayInputStream(buffer.array());
-    }
-
 }

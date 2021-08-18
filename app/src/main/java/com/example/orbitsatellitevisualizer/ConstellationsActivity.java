@@ -65,7 +65,6 @@ public class ConstellationsActivity extends TopBarActivity {
     private static final String TAG_DEBUG = "ConstellationActivity";
 
     private Dialog dialog;
-    //private DemoThread demoThread = null;
     private Handler handler = new Handler();
     private TextView connectionStatus;
     private List<Action> actionsSaved = new ArrayList<>();
@@ -106,49 +105,15 @@ public class ConstellationsActivity extends TopBarActivity {
         ActionController.getInstance().sendIridiumConstFile(ConstellationsActivity.this);
     }
 
-    private Runnable createRunnableStarlink(final String paramStr){
-
-        Runnable StarlinkRunnable = new Runnable(){
-            public void run(){
-                ActionController.getInstance().cleanFileKMLs(0);
-                System.out.println("IN RUNNABLE");
-                System.out.println("SENDMESSAGE output: " + paramStr);
-                ActionController.getInstance().sendLiveGroup(ConstellationsActivity.this, paramStr);
-                mHandler.postDelayed(this, 30000);
-            }
-        };
-        return StarlinkRunnable;
-    }
-
     public void sendStarlinkLive(View view) {
-        /*
-        Intent intent = new Intent(this, ConstellationsActivity.class);
-        EditText editText = (EditText) findViewById(R.id.editTextTextPersonName);
-        String message = editText.getText().toString();
-
-        intent.putExtra(EXTRA_MESSAGE, message);
-        startActivity(intent);
-        */
         String message = "STARLINK";
         System.out.println("SENDMESSAGE output: " + message);
         ActionController.getInstance().sendLiveGroup(ConstellationsActivity.this, message);
-        //Runnable myRunnable = createRunnableStarlink(message);
-        //mHandler.postDelayed(myRunnable, 0);
     }
 
     public void sendIridiumLive(View view) {
-        /*
-        Intent intent = new Intent(this, ConstellationsActivity.class);
-        EditText editText = (EditText) findViewById(R.id.editTextTextPersonName);
-        String message = editText.getText().toString();
-
-        intent.putExtra(EXTRA_MESSAGE, message);
-        startActivity(intent);
-        */
         String message = "IRIDIUM";
         System.out.println("SENDMESSAGE output: " + message);
         ActionController.getInstance().sendLiveGroup(ConstellationsActivity.this, message);
-        //Runnable myRunnable = createRunnableStarlink(message);
-        //mHandler.postDelayed(myRunnable, 0);
     }
 }

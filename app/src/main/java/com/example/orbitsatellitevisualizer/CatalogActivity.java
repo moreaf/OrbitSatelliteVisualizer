@@ -41,7 +41,6 @@ public class CatalogActivity extends TopBarActivity {
     private String scn;
     Timer t = new Timer();
 
-    private DemoThread demoThread = null;
     private Handler handler = new Handler();
     private TextView connectionStatus;
     private Button buttDemo;
@@ -73,86 +72,6 @@ public class CatalogActivity extends TopBarActivity {
         }, 1000);
     }
 
-    /*
-    public void sendMessage(View view) {
-        Intent intent = new Intent(this, CatalogActivity.class);
-        EditText editText = (EditText) findViewById(R.id.scn_field);
-        String message = editText.getText().toString();
-        scn = editText.getText().toString();
-        intent.putExtra(EXTRA_MESSAGE, message);
-        startActivity(intent);
-        System.out.println("SENDMESSAGE output: " + message);
-        ActionController.getInstance().sendLiveSCN(CatalogActivity.this, message);
-
-        runDemo(message);
-        /*
-        t.scheduleAtFixedRate(new TimerTask() {
-              @Override
-              public void run() {
-                  System.out.println("Checking");
-                  ActionController.getInstance().cleanFileKMLs(0);
-                  System.out.println("SENDMESSAGE output: " + scn);
-                  ActionController.getInstance().sendLiveSCN(CatalogActivity.this, scn);
-              }
-          },
-                0,
-                10000);
-    }
-    */
-
-    /**
-     * Run the demo that is pre saved
-     */
-    private void runDemo(String message) {
-        getDialog();
-        System.out.println("IN RUN DEMO, message: " + message);
-
-        AtomicBoolean isConnected = new AtomicBoolean(false);
-        LGConnectionTest.testPriorConnection(this, isConnected);
-        SharedPreferences sharedPreferences = getSharedPreferences(ConstantPrefs.SHARED_PREFS.name(), MODE_PRIVATE);
-        handler.postDelayed(() -> {
-            if (isConnected.get()) {
-                dialog.show();
-                demoThread = new DemoThread(message,CatalogActivity.this, dialog);
-                demoThread.start();
-            }
-            loadConnectionStatus(sharedPreferences);
-        }, 1200);
-
-    }
-
-
-    /**
-     * It gives a dialog with a cancel button
-     */
-    private void getDialog() {
-        System.out.println("IN GET DIALOG");
-        AlertDialog.Builder builder = new AlertDialog.Builder(CatalogActivity.this);
-        @SuppressLint("InflateParams") View v = getLayoutInflater().inflate(R.layout.dialog_fragment, null);
-        v.getBackground().setAlpha(220);
-        Button ok = v.findViewById(R.id.ok);
-        ok.setText(getResources().getString(R.string.stop_demo));
-        ok.setOnClickListener(view -> {
-            stopDemo();
-            CustomDialogUtility.showDialog(CatalogActivity.this, getResources().getString(R.string.stop_message));
-        });
-        TextView textMessage = v.findViewById(R.id.message);
-        textMessage.setText(getResources().getString(R.string.start_demo));
-        textMessage.setTextSize(23);
-        textMessage.setGravity(View.TEXT_ALIGNMENT_CENTER);
-        builder.setView(v);
-        dialog = builder.create();
-        dialog.setCanceledOnTouchOutside(false);
-    }
-
-    /**
-     * Stop the demo
-     */
-    public void stopDemo() {
-        demoThread.stop();
-        dialog.dismiss();
-    }
-
     /**
      * Set the connection status on the view
      */
@@ -163,19 +82,6 @@ public class CatalogActivity extends TopBarActivity {
         } else {
             connectionStatus.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_status_connection_red));
         }
-    }
-
-    @Override
-    protected void onPause() {
-        if (demoThread != null) stopDemo();
-        demoThread = null;
-        super.onPause();
-    }
-
-    public void onStop(View view) {
-        if (demoThread != null) stopDemo();
-        demoThread = null;
-        super.onPause();
     }
 
     public void load_enxaneta(View v){

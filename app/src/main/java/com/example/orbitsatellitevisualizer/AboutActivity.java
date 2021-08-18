@@ -22,7 +22,6 @@ public class AboutActivity extends TopBarActivity {
 
         View topBar = findViewById(R.id.top_bar);
         buttAbout = topBar.findViewById(R.id.butt_about);
-        //changeButtonClickableBackgroundColor();
 
         TextView linkLinkedId= findViewById(R.id.linked_id);
         linkLinkedId.setMovementMethod(LinkMovementMethod.getInstance());
@@ -30,14 +29,4 @@ public class AboutActivity extends TopBarActivity {
         TextView linkGithub= findViewById(R.id.github_account);
         linkGithub.setMovementMethod(LinkMovementMethod.getInstance());
     }
-
-
-    /**
-     * Change the background color and the option clickable to false of the button_connect
-     */
-    /*
-    private void changeButtonClickableBackgroundColor() {
-        changeButtonClickableBackgroundColor(getApplicationContext(), buttAbout);
-    }
-    */
 }

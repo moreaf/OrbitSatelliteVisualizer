@@ -31,7 +31,6 @@ public class SingleSpacecraftsActivity extends TopBarActivity {
     private static final String TAG_DEBUG = "SingleSpacecraftsActivity";
 
     private Dialog dialog;
-    //private DemoThread demoThread = null;
     private Handler handler = new Handler();
     private TextView connectionStatus;
     private List<Action> actionsSaved = new ArrayList<>();
@@ -42,68 +41,12 @@ public class SingleSpacecraftsActivity extends TopBarActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_spacecrafts);
-
         View topBar = findViewById(R.id.top_bar);
         buttDemo = topBar.findViewById(R.id.butt_spaceports);
         connectionStatus = findViewById(R.id.connection_status);
-
-
         SharedPreferences sharedPreferences = getSharedPreferences(ConstantPrefs.SHARED_PREFS.name(), MODE_PRIVATE);
 
     }
-
-    /**
-     * Run the demo that is pre saved
-     */
-
-    private String readDemoFile() {
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(
-                    new InputStreamReader(getAssets().open("demo.txt"), StandardCharsets.UTF_8));
-
-            StringBuilder string = new StringBuilder();
-            String mLine;
-            while ((mLine = reader.readLine()) != null) {
-                string.append(mLine);
-            }
-            return string.toString();
-        } catch (IOException e) {
-            Log.w(TAG_DEBUG, "ERROR READING FILE: " + e.getMessage());
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    Log.w(TAG_DEBUG, "ERROR CLOSING: " + e.getMessage());
-                }
-            }
-        }
-        return "";
-    }
-
-    /**
-     * It gives a dialog with a cancel button
-     */
-    private void getDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(SingleSpacecraftsActivity.this);
-        @SuppressLint("InflateParams") View v = getLayoutInflater().inflate(R.layout.dialog_fragment, null);
-        v.getBackground().setAlpha(220);
-        Button ok = v.findViewById(R.id.ok);
-        ok.setText(getResources().getString(R.string.stop_demo));
-        ok.setOnClickListener(view -> {
-
-            CustomDialogUtility.showDialog(SingleSpacecraftsActivity.this, getResources().getString(R.string.stop_message));
-        });
-        TextView textMessage = v.findViewById(R.id.message);
-        textMessage.setText(getResources().getString(R.string.start_demo));
-        textMessage.setTextSize(23);
-        textMessage.setGravity(View.TEXT_ALIGNMENT_CENTER);
-        builder.setView(v);
-        dialog = builder.create();
-        dialog.setCanceledOnTouchOutside(false);
-    }
-
 
     public void sendStarlink(View view) {
         ActionController.getInstance().sendStarlinkfile(SingleSpacecraftsActivity.this);

@@ -17,7 +17,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.OrbitSatelliteVisualizer">
         <activity android:name=".DemoThread"></activity>
-        <activity android:name=".DemoActivity" />
         <activity android:name=".RocketsActivity" />
         <activity android:name=".SpaceportsActivity" />
         <activity
