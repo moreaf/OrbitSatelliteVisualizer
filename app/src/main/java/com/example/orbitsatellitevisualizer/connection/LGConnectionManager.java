@@ -123,7 +123,7 @@ public class LGConnectionManager implements Runnable {
      */
     private boolean sendLGCommand(LGCommand lgCommand) {
         lgCommandToReSend = lgCommand;
-        //Log.d("ConnectionManager", "sending a lgcommand: " + lgCommand.getCommand());
+        Log.d("ConnectionManager", "sending a lgcommand: " + lgCommand.getCommand());
         Session session = getSession();
         if (session == null || !session.isConnected()) {
             Log.d("ConnectionManager", "session not connected: " + lgCommand.getCommand());
@@ -150,7 +150,7 @@ public class LGConnectionManager implements Runnable {
 
             if (lgCommand.getPriorityType() == LGCommand.CRITICAL_MESSAGE) {
                 response = Objects.requireNonNull(outputBuffer).toString();
-                //Log.w(TAG_DEBUG, "response: " + response);
+                Log.w(TAG_DEBUG, "response: " + response);
             }
 
             lgCommand.doAction(response);

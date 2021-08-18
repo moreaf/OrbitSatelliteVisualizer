@@ -232,6 +232,14 @@ public class ActionBuildCommandUtility {
         return command;
     }
 
+    static String buildWriteRocketFile() {
+        String command = "echo 'http://lg1:81/resources/rocket_simulation.kml' > " +
+                BASE_PATH +
+                "kmls.txt";
+        Log.w(TAG_DEBUG, "command: " + command);
+        return command;
+    }
+
     /**
      * Build the command to paint the shape in liquid galaxy
      * @param shape Shape with the information
@@ -693,13 +701,43 @@ public class ActionBuildCommandUtility {
                 .append("<kml xmlns=\"http://www.opengis.net/kml/2.2\"\n")
                 .append("xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\"> \n")
                 .append("<gx:Tour> \n").append(" <name>Orbit</name> \n").append(" <gx:Playlist> \n");
-        orbitLLA(lla_coordinates, command);
+        orbitLLA(lla_coordinates, command, 1000);
         command.append(" </gx:Playlist>\n")
                 .append("</gx:Tour>\n").append("</kml> " + "' > ")
                 .append(BASE_PATH).append("Orbit.kml");
         Log.w(TAG_DEBUG, "Command: " + command.toString());
         return  command.toString();
     }
+
+    public static String buildCommandInsertOrbit(double[] lla_coordinates, int camera_height) {
+        StringBuilder command = new StringBuilder();
+        command.append("<gx:Tour> \n").append(" <name>Orbit</name> \n").append(" <gx:Playlist> \n");
+        orbitLLA(lla_coordinates, command, camera_height);
+        command.append(" </gx:Playlist>\n")
+                .append("</gx:Tour>\n");
+        Log.w(TAG_DEBUG, "INSERTED ORBIT: " + command.toString());
+        return  command.toString();
+    }
+
+    public static String buildCommandInsertFlyTo2(double[] lla_coordinates) {
+        StringBuilder command = new StringBuilder();
+        //command.append("<gx:Tour> \n").append(" <name>Orbit</name> \n").append(" <gx:Playlist> \n");
+        flyToLLA(lla_coordinates, command);
+        String new_command = "echo '" + command + "' > /tmp/query.txt";
+        Log.w(TAG_DEBUG, "command: " + new_command);
+        return new_command.toString();
+    }
+
+    public static String buildCommandInsertFlyTo(double[] lla_coordinates) {
+        StringBuilder command = new StringBuilder();
+        command.append("<gx:Tour> \n").append(" <name>Orbit</name> \n").append(" <gx:Playlist> \n");
+        flyToLLA(lla_coordinates, command);
+        command.append(" </gx:Playlist>\n")
+                .append("</gx:Tour>\n");
+        Log.w(TAG_DEBUG, "INSERTED ORBIT: " + command.toString());
+        return  command.toString();
+    }
+
 
     public static String buildCommandWriteOrbit() {
         String command = "echo 'http://lg1:81/Orbit.kml'  > " +
@@ -833,7 +871,7 @@ public class ActionBuildCommandUtility {
         }
     }
 
-    private static void orbitLLA(double[] lla_coordinates, StringBuilder command) {
+    private static void orbitLLA(double[] lla_coordinates, StringBuilder command, int camera_height) {
         double heading = 0;
         int orbit = 0;
         while (orbit <= 36) {
@@ -843,16 +881,36 @@ public class ActionBuildCommandUtility {
                     .append("     <LookAt> \n")
                     .append("      <longitude>").append(lla_coordinates[1]).append("</longitude> \n")
                     .append("      <latitude>").append(lla_coordinates[0]).append("</latitude> \n")
+                    .append("      <altitude>").append(lla_coordinates[2]).append("</altitude> \n")
                     .append("      <heading>").append(heading).append("</heading> \n")
-                    .append("      <tilt>").append(60).append("</tilt> \n")
+                    .append("      <tilt>").append(45).append("</tilt> \n")
                     .append("      <gx:fovy>35</gx:fovy> \n")
-                    .append("      <range>").append(lla_coordinates[2]+2000).append("</range> \n")
-                    .append("      <gx:altitudeMode>absolute</gx:altitudeMode> \n")
+                    .append("      <range>").append(lla_coordinates[2] + camera_height).append("</range> \n")
+                    .append("      <gx:altitudeMode>relativeToGround</gx:altitudeMode> \n")
                     .append("      </LookAt> \n")
                     .append("    </gx:FlyTo> \n\n");
             heading = heading + 10;
             orbit++;
         }
+    }
+
+    private static void flyToLLA(double[] lla_coordinates, StringBuilder command) {
+        double heading = 0;
+
+            if (heading >= 360) heading = heading - 360;
+            command.append("    <gx:FlyTo>\n").append("    <gx:duration>6</gx:duration> \n")
+                    .append("    <gx:flyToMode>smooth</gx:flyToMode> \n")
+                    .append("     <LookAt> \n")
+                    .append("      <longitude>").append(lla_coordinates[1]).append("</longitude> \n")
+                    .append("      <latitude>").append(lla_coordinates[0]).append("</latitude> \n")
+                    .append("      <altitude>").append(lla_coordinates[2]).append("</altitude> \n")
+                    .append("      <heading>").append(heading).append("</heading> \n")
+                    .append("      <tilt>").append(60).append("</tilt> \n")
+                    .append("      <gx:fovy>35</gx:fovy> \n")
+                    .append("      <range>").append(lla_coordinates[2]+100000).append("</range> \n")
+                    .append("      <gx:altitudeMode>relativeToGround</gx:altitudeMode> \n")
+                    .append("      </LookAt> \n")
+                    .append("    </gx:FlyTo> \n\n");
     }
 
     private static void movement(POI poi, StringBuilder command, int duration) {

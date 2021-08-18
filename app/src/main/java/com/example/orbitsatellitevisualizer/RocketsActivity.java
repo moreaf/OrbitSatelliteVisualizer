@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.orbitsatellitevisualizer.create.utility.model.ActionController;
+
 public class RocketsActivity extends TopBarActivity {
     private static final String TAG_DEBUG = "RocketActivity";
     public static final String EXTRA_MESSAGE = "com.example.orbitsatellitevisualizer.MESSAGE";
@@ -19,5 +21,13 @@ public class RocketsActivity extends TopBarActivity {
         setContentView(R.layout.activity_rockets);
         View topBar = findViewById(R.id.top_bar);
         buttRocket = topBar.findViewById(R.id.butt_rockets);
+    }
+
+    public void cleanLG(View view){
+        ActionController.getInstance().cleanFileKMLs(0);
+    }
+
+    public void sendRocketTrajectory(View view) {
+        ActionController.getInstance().sendRocketTraj(RocketsActivity.this);
     }
 }

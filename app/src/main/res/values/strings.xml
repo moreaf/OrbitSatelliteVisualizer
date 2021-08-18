@@ -62,8 +62,8 @@
 
     // Top Bar
     <string name="menu_scn">Search by SCN</string>
-    <string name="menu_single_spacecrafts">Single Spacecrafts</string>
-    <string name="menu_constellations">Constellations</string>
+    <string name="menu_single_spacecrafts">Single Orbits</string>
+    <string name="menu_constellations">Satellite Constellations</string>
     <string name="menu_rocket">Rockets</string>
     <string name="menu_spaceports">Spaceports</string>
     <string name="menu_connect">Connect</string>
@@ -304,9 +304,9 @@
     <string name="button_show_iss">DISPLAY ORBIT</string>
     <string name="button_show_starlink">DISPLAY ORBIT</string>
     <string name="button_show_enxaneta">DISPLAY ORBIT</string>
-    <string name="starlink_constellation">SHOW STARLINKS ORBITS</string>
-    <string name="iridium_constellation">SHOW IRIDIUMS CONSTELLATIONS</string>
-    <string name="starlink_const_live">SHOW STARLINKS LIVE</string>
+    <string name="starlink_constellation">SHOW STARLINK ORBITS</string>
+    <string name="iridium_constellation">SHOW IRIDIUMS ORBITS</string>
+    <string name="starlink_const_live">SHOW STARLINK LIVE</string>
     <string name="iridium_const_live">SHOW IRIDIUMS LIVE</string>
     <string name="get_tle">GET TLE</string>
     <string name="button_iss_live">DISPLAY LIVE</string>
@@ -316,5 +316,19 @@
     <string name="text_catalog">You can display any satellite or orbiting body around Earth just by inserting here its Satellite Catalog Number</string>
     <string name="enter_SCN">Enter a Satellite Catalog Number...</string>
     <string name="button_send_scn">DISPLAY SATELLITE</string>
-    <string name="scn_description">The Satellite Catalog Number (also known as NORAD (North American Aerospace Defense) Catalog Number, NORAD ID, USSPACECOM object number or simply catalog number, among similar variants) is a sequential nine-digit number assigned by the United States Space Command (USSPACECOM) in order of discovery to all artificial objects in the orbits of Earth and Mars and space probes launched from Earth.[1] The first catalogued object, catalog number 1, is the Sputnik 1 launch vehicle, with the Sputnik 1 satellite having been assigned catalog number 2.</string>
+    <string name="scn_description">The Satellite Catalog Number (also known as NORAD (North American Aerospace Defense) Catalog Number, NORAD ID or USSPACECOM object number ) is a sequential nine-digit number assigned by the United States Space Command in order of discovery to all artificial objects in the orbits of Earth and Mars and space probes launched from Earth. The first catalogued object, catalog number 1, is the Sputnik 1 launch vehicle, with the Sputnik 1 satellite having been assigned catalog number 2.</string>
+    <string name="stop_live_display">STOP LIVE DISPLAY</string>
+    <string name="clean_kml">CLEAN LG DISPLAY</string>
+    <string name="load_enxaneta">LOAD ENXANETA SCN 47954</string>
+    <string name="load_iss">LOAD ISS SCN 25544</string>
+    <string name="load_starlink">LOAD STARLINK-24 SCN 44238</string>
+    <string name="load_iridium">LOAD IRIDIUM 7 SCN 24793</string>
+    <string name="load_tiangong">LOAD TIANGONG 1 SCN 37820</string>
+
+    <string name="sp_baikonur">BAIKONUR</string>
+    <string name="sp_china">JIUQUAN</string>
+    <string name="sp_kourou">KOUROU</string>
+    <string name="sp_ksc">KENNEDY SPACE CENTER</string>
+    <string name="sp_rocketlab">MAHIA</string>
+    <string name="sp_starbase">STARBASE</string>
 </resources>

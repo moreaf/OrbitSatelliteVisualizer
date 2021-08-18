@@ -49,7 +49,7 @@ public class SingleSpacecraftsActivity extends TopBarActivity {
 
 
         SharedPreferences sharedPreferences = getSharedPreferences(ConstantPrefs.SHARED_PREFS.name(), MODE_PRIVATE);
-        loadConnectionStatus(sharedPreferences);
+
     }
 
     /**
@@ -105,39 +105,6 @@ public class SingleSpacecraftsActivity extends TopBarActivity {
     }
 
 
-    /**
-     * Test the connection and then do the tour
-     *
-     * @param actionsSaved The list of actions or null if is a test
-     */
-
-    /**
-     * Stop the demo
-     */
-
-    /**
-     * Set the connection status on the view
-     */
-    private void loadConnectionStatus(SharedPreferences sharedPreferences) {
-        boolean isConnected = sharedPreferences.getBoolean(ConstantPrefs.IS_CONNECTED.name(), false);
-        if (isConnected) {
-            connectionStatus.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_status_connection_green));
-        } else {
-            connectionStatus.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_status_connection_red));
-        }
-    }
-
-    /**
-     * Change the background color and the option clickable to false of the button_connect
-     */
-
-
-
-
-    /** MODIFIED CODE BY ALBERT */
-    /** Called when the user taps the Send button */
-
-
     public void sendStarlink(View view) {
         ActionController.getInstance().sendStarlinkfile(SingleSpacecraftsActivity.this);
     }
@@ -148,15 +115,5 @@ public class SingleSpacecraftsActivity extends TopBarActivity {
 
     public void sendISS(View view) {
         ActionController.getInstance().sendISSfile(SingleSpacecraftsActivity.this);
-    }
-
-    public void sendEnxanetaLive(View view) {
-        ActionController.getInstance().sendLiveEnxaneta(SingleSpacecraftsActivity.this);
-    }
-    public void sendISSLive(View view) {
-        ActionController.getInstance().sendLiveISS(SingleSpacecraftsActivity.this);
-    }
-    public void sendStarlinkLive(View view) {
-        ActionController.getInstance().sendLiveStarlink(SingleSpacecraftsActivity.this);
     }
 }

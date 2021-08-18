@@ -129,11 +129,11 @@ public class ConstellationsActivity extends TopBarActivity {
         intent.putExtra(EXTRA_MESSAGE, message);
         startActivity(intent);
         */
-        String message = "GPS-OPS";
+        String message = "STARLINK";
         System.out.println("SENDMESSAGE output: " + message);
         ActionController.getInstance().sendLiveGroup(ConstellationsActivity.this, message);
-        Runnable myRunnable = createRunnableStarlink(message);
-        mHandler.postDelayed(myRunnable, 0);
+        //Runnable myRunnable = createRunnableStarlink(message);
+        //mHandler.postDelayed(myRunnable, 0);
     }
 
     public void sendIridiumLive(View view) {
@@ -148,7 +148,7 @@ public class ConstellationsActivity extends TopBarActivity {
         String message = "IRIDIUM";
         System.out.println("SENDMESSAGE output: " + message);
         ActionController.getInstance().sendLiveGroup(ConstellationsActivity.this, message);
-        Runnable myRunnable = createRunnableStarlink(message);
-        mHandler.postDelayed(myRunnable, 0);
+        //Runnable myRunnable = createRunnableStarlink(message);
+        //mHandler.postDelayed(myRunnable, 0);
     }
 }
