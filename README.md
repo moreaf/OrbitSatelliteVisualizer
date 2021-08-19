@@ -24,3 +24,13 @@ The first step to perform when opening the application is to navigate to "Connec
 
 The license of this project is MIT License.
 
+## Snapshots
+Find hereunder some screenshots of the application:
+![Screenshot_connect](https://user-images.githubusercontent.com/51099090/130057286-1da7f9a8-ba76-40e5-abab-cff2003286d2.png)
+![Screenshot_spaceports](https://user-images.githubusercontent.com/51099090/130057252-a845c3a6-a3b4-41cc-93be-67d772a6bc6c.png)
+![Screenshot_rocket](https://user-images.githubusercontent.com/51099090/130057271-1321ad51-e1ba-4192-802b-8bbab5c5f7cd.png)
+![Screenshot_constellations](https://user-images.githubusercontent.com/51099090/130057276-2f5280d8-000a-4271-b378-8235b717ab4b.png)
+![Screenshot_singleorbits](https://user-images.githubusercontent.com/51099090/130057278-5d74a73f-6e27-464b-b986-44da1adaa872.png)
+![Screenshot_Search](https://user-images.githubusercontent.com/51099090/130057283-0b1f043a-8de9-465a-9edb-eb20a312ad50.png)
+
+
